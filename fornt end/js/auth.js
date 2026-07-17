@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "https://explore-tamilnadu-api.onrender.com/api/auth";
 
 // ================= SIGNUP =================
 document.getElementById("signupForm")?.addEventListener("submit", async (e) => {

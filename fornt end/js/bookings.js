@@ -1,6 +1,6 @@
 const token = localStorage.getItem("token");
 
-fetch("http://localhost:5000/api/bookings/my", {
+fetch("https://explore-tamilnadu-api.onrender.com/api/bookings/my", {
     headers: {
         Authorization: "Bearer " + token
     }

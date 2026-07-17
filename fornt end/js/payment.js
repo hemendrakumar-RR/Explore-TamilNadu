@@ -29,7 +29,7 @@ async function payNow() {
                 booking.paymentId = response.razorpay_payment_id;
                 booking.paymentStatus = "Paid";
         
-                const res = await fetch("http://localhost:5000/api/bookings", {
+                const res = await fetch("https://explore-tamilnadu-api.onrender.com/api/bookings", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
