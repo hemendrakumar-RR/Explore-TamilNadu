@@ -16,10 +16,8 @@ const app = express();
 
 connectDB();
 
-app.use(cors({
-  origin: "https://explore-tamil-nadu.vercel.app",
-  credentials: true
-}));app.use(express.json());
+app.use(cors());
+app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/bookings", bookingRoutes);
