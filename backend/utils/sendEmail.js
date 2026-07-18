@@ -1,9 +1,7 @@
 const nodemailer = require("nodemailer");
-const dns = require("dns");
-dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host: "smtp-relay.brevo.com",
     port: 587,
     secure: false,
     auth: {
@@ -15,13 +13,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (options) => {
     try {
 
-        console.log("📧 Connecting to Gmail...");
-
-        await transporter.verify();
-
-        console.log("✅ Gmail Connected");
-
-        console.log("📨 Sending email...");
+        console.log("📨 Sending Email...");
 
         const info = await transporter.sendMail({
             from: `"Explore Tamil Nadu" <${process.env.EMAIL_USER}>`,
@@ -35,10 +27,7 @@ const sendEmail = async (options) => {
         console.log(info.messageId);
 
     } catch (err) {
-
-        console.error("❌ Email Error:");
         console.error(err);
-
         throw err;
     }
 };
