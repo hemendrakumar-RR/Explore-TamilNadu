@@ -47,9 +47,9 @@ const sendEmail = async (options) => {
         console.log(response.data);
 
     } catch (err) {
-        console.error(
-            err.response ? err.response.data : err.message
-        );
+        console.error("Status:", err.response?.status);
+        console.error("Data:", err.response?.data);
+        console.error("Message:", err.message);
         throw err;
     }
 };
