@@ -50,17 +50,15 @@ data.places.map(place =>
 
 <div class="place-info">
 
-<span>⭐ ${place.rating}</span>
+    <span>⭐ ${place.rating}</span>
 
-<span> ${place.time}</span>
+    <span>${place.time}</span>
 
+    <h5 class="text-success">
+        ₹${place.total || place.price}
+    </h5>
 
-
-<h5 class="text-success">
-
-₹${place.total || place.price}
-
-</h5></span></div>
+</div>
 <div class="d-grid gap-2 mt-3">
 
 <a href="https://www.google.com/maps/search/${encodeURIComponent(place.name)}"
@@ -74,10 +72,11 @@ data.places.map(place =>
 
 <button
     class="btn btn-warning w-100 mt-2"
-    onclick="openPlaceBooking(\`${place.name}\`, ${place.price})"   
+    onclick='openPlaceBooking(${JSON.stringify(place.name)}, ${place.price})'>
+
     Add to Trip
 
-</button>   
+</button>  
 
 </div>
 
@@ -113,10 +112,13 @@ class="card-img-top">
 
 <h5 class="text-success">${hotel.price}</h5>
 
+
 <button
 class="btn btn-warning w-100"
-onclick='openHotelBooking(${JSON.stringify(hotel.name)}, ${hotel.price.replace(/[^\d]/g,'')})'
+onclick='openHotelBooking(${JSON.stringify(hotel.name)}, ${hotel.price.replace(/[^\d]/g,"")})'>
+
 Reserve Hotel
+
 </button>
 </div>
 
@@ -152,7 +154,8 @@ data.transport.map(car =>
 
 <button
 class="btn btn-warning w-100"
-onclick='openTransportBooking(${JSON.stringify(car.name)}, ${car.price})'
+onclick='openTransportBooking(${JSON.stringify(car.name)}, ${car.price})'>
+
 Reserve Vehicle
 
 </button>
