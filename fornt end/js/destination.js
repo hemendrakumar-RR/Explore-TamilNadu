@@ -74,8 +74,7 @@ data.places.map(place =>
 
 <button
     class="btn btn-warning w-100 mt-2"
-    onclick="openPlaceBooking('${place.name}', ${place.price})">
-
+    onclick="openPlaceBooking(\`${place.name}\`, ${place.price})"   
     Add to Trip
 
 </button>   
@@ -116,7 +115,7 @@ class="card-img-top">
 
 <button
 class="btn btn-warning w-100"
-onclick="openHotelBooking('${hotel.name}', ${hotel.price.replace(/[^\d]/g,'')})">
+onclick='openHotelBooking(${JSON.stringify(hotel.name)}, ${hotel.price.replace(/[^\d]/g,'')})'
 Reserve Hotel
 </button>
 </div>
@@ -153,8 +152,7 @@ data.transport.map(car =>
 
 <button
 class="btn btn-warning w-100"
-onclick="openTransportBooking('${car.name}', ${car.price})">
-
+onclick='openTransportBooking(${JSON.stringify(car.name)}, ${car.price})'
 Reserve Vehicle
 
 </button>
