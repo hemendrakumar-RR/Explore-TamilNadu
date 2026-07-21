@@ -1,42 +1,60 @@
-const { Resend } = require("resend");
+const axios = require("axios");
 const fs = require("fs");
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async (options) => {
     try {
 
-        console.log("📨 Sending Email via Resend...");
+        console.log("📨 Sending Email via Brevo...");
 
         const attachments = [];
 
-        if (options.attachments && options.attachments.length > 0) {
+        if (options.attachments?.length) {
             for (const file of options.attachments) {
                 attachments.push({
-                    filename: file.filename,
-                    content: fs.readFileSync(file.path)
+                    name: file.filename,
+                    content: fs.readFileSync(file.path).toString("base64")
                 });
             }
         }
 
-        const { data, error } = await resend.emails.send({
-            from: "Explore Tamil Nadu <onboarding@resend.dev>",
-            to: options.email,
-            subject: options.subject,
-            html: options.message,
-            attachments
-        });
-
-        if (error) {
-            console.error(error);
-            throw new Error(error.message);
-        }
+        const response = await axios.post(
+            "https://api.brevo.com/v3/smtp/email",
+            {
+                sender: {
+                    name: "Explore Tamil Nadu",
+                    email: "exploretamilnadu8@gmail.com"
+                },
+                to: [
+                    {
+                        email: options.email
+                    }
+                ],
+                subject: options.subject,
+                htmlContent: options.message,
+                attachment: attachments
+            },
+            {
+                headers: {
+                    "accept": "application/json",
+                    "api-key": process.env.BREVO_API_KEY,
+                    "content-type": "application/json"
+                }
+            }
+        );
 
         console.log("✅ Email Sent");
-        console.log(data);
+        console.log(response.data);
 
     } catch (err) {
-        console.error(err);
+
+        if (err.response) {
+            console.error("❌ Brevo Error:");
+            console.error(err.response.status);
+            console.error(err.response.data);
+        } else {
+            console.error(err.message);
+        }
+
         throw err;
     }
 };
