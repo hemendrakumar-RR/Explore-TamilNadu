@@ -22,6 +22,9 @@ const sendEmail = async (options) => {
             {
                 sender: {
                     name: "Explore Tamil Nadu",
+                    email: "exploretamilnadu8@11694031.brevosend.com"
+                },
+                replyTo: {
                     email: "exploretamilnadu8@gmail.com"
                 },
                 to: [
