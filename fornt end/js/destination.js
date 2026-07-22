@@ -69,14 +69,15 @@ data.places.map(place =>
     View on Maps
 
 </a>
-
 <button
-    class="btn btn-warning w-100 mt-2"
-    onclick='openPlaceBooking(${JSON.stringify(place.name)}, ${place.price})'>
+class="btn btn-warning w-100 mt-2"
+data-name="${place.name}"
+data-price="${place.price}"
+onclick="openPlaceBooking(this.dataset.name, Number(this.dataset.price))">
 
-    Add to Trip
+Add to Trip
 
-</button>  
+</button>
 
 </div>
 

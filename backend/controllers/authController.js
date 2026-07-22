@@ -3,13 +3,14 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
 
-// Register User
+// ================= REGISTER =================
 exports.register = async (req, res) => {
   try {
     const { fullName, email, password } = req.body;
 
     if (!fullName || !email || !password) {
       return res.status(400).json({
+        success: false,
         message: "All fields are required",
       });
     }
@@ -18,6 +19,7 @@ exports.register = async (req, res) => {
 
     if (existingUser) {
       return res.status(400).json({
+        success: false,
         message: "User already exists",
       });
     }
@@ -29,40 +31,63 @@ exports.register = async (req, res) => {
       email,
       password: hashedPassword,
     });
-    
-    // Send Welcome Email
+
+    // Welcome Email
     try {
+      console.log(" Sending Welcome Email to:", user.email);
+
       await sendEmail({
         email: user.email,
-        subject: "Welcome to Explore Tamil Nadu 🌴",
+        subject: "🎉 Welcome to Explore Tamil Nadu",
         message: `
-          <div style="font-family:Arial,sans-serif;background:#f4f4f4;padding:30px;">
-            <div style="max-width:600px;margin:auto;background:#fff;border-radius:10px;">
+          <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:30px;">
+            <div style="max-width:600px;margin:auto;background:#ffffff;border-radius:10px;overflow:hidden;">
+
               <div style="background:#0d6efd;padding:20px;text-align:center;">
-                <h1 style="color:#fff;">Explore Tamil Nadu</h1>
+                <h1 style="color:#fff;margin:0;">
+                  Explore Tamil Nadu
+                </h1>
               </div>
-    
+
               <div style="padding:30px;">
-                <h2>Hello ${user.fullName}, 👋</h2>
-    
-                <p>Welcome to <strong>Explore Tamil Nadu</strong>.</p>
-    
+
+                <h2>Hello ${user.fullName}</h2>
+
+                <p>Welcome to <b>Explore Tamil Nadu</b>.</p>
+
                 <p>Your account has been created successfully.</p>
-    
-                <p>We hope you enjoy discovering amazing destinations across Tamil Nadu.</p>
-    
-                <hr>
-    
-                <p>Happy Travelling ❤️</p>
-    
-                <strong>Explore Tamil Nadu Team</strong>
+
+                <p>
+                  You can now:
+                </p>
+
+                <ul>
+                  <li>Explore destinations</li>
+                  <li>Book hotels</li>
+                  <li>Reserve transport</li>
+                  <li>Plan complete trips</li>
+                </ul>
+
+                <br>
+
+                <p>Happy Travelling </p>
+
+                <b>Explore Tamil Nadu Team</b>
+
               </div>
+
             </div>
           </div>
         `,
       });
+
+      console.log("✅ Welcome Email Sent Successfully");
+
     } catch (emailError) {
-      console.error("Welcome email failed:", emailError);
+
+      console.error("❌ Welcome Email Failed");
+      console.error(emailError.message);
+
     }
 
     res.status(201).json({
@@ -74,25 +99,31 @@ exports.register = async (req, res) => {
         email: user.email,
       },
     });
+
   } catch (error) {
+
     console.error(error);
 
     res.status(500).json({
       success: false,
       message: "Server Error",
     });
+
   }
 };
 
-// Login User
+// ================= LOGIN =================
 exports.login = async (req, res) => {
+
   try {
+
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({
+        success: false,
         message: "Invalid Email",
       });
     }
@@ -101,12 +132,12 @@ exports.login = async (req, res) => {
 
     if (!isMatch) {
       return res.status(400).json({
+        success: false,
         message: "Invalid Password",
       });
     }
 
     const token = jwt.sign(
-
       {
         id: user._id,
       },
@@ -115,68 +146,83 @@ exports.login = async (req, res) => {
         expiresIn: "7d",
       }
     );
-    // Send Login Notification Email
-try {
-  const loginDate = new Date();
 
-  await sendEmail({
-    email: user.email,
-    subject: "New Login to Your Explore Tamil Nadu Account",
-    message: `
-      <div style="font-family:Arial,sans-serif;background:#f4f4f4;padding:30px;">
-        <div style="max-width:600px;margin:auto;background:#ffffff;border-radius:10px;overflow:hidden;">
+    // Login Email
+    try {
 
-          <div style="background:#0d6efd;padding:20px;text-align:center;">
-            <h1 style="color:#ffffff;margin:0;">Explore Tamil Nadu</h1>
+      console.log("📧 Sending Login Email to:", user.email);
+
+      const loginDate = new Date();
+
+      await sendEmail({
+        email: user.email,
+        subject: " Login Alert - Explore Tamil Nadu",
+        message: `
+          <div style="font-family:Arial,sans-serif;background:#f5f5f5;padding:30px;">
+
+            <div style="max-width:600px;margin:auto;background:#ffffff;border-radius:10px;overflow:hidden;">
+
+              <div style="background:#198754;padding:20px;text-align:center;">
+                <h1 style="color:#ffffff;margin:0;">
+                  Explore Tamil Nadu
+                </h1>
+              </div>
+
+              <div style="padding:30px;">
+
+                <h2>Hello ${user.fullName}</h2>
+
+                <p>Your account has been logged in successfully.</p>
+
+                <table style="width:100%;border-collapse:collapse;margin-top:20px;">
+
+                  <tr>
+                    <td><b>Email</b></td>
+                    <td>${user.email}</td>
+                  </tr>
+
+                  <tr>
+                    <td><b>Date</b></td>
+                    <td>${loginDate.toLocaleDateString()}</td>
+                  </tr>
+
+                  <tr>
+                    <td><b>Time</b></td>
+                    <td>${loginDate.toLocaleTimeString()}</td>
+                  </tr>
+
+                </table>
+
+                <br>
+
+                <p>
+                  If this login was performed by you, you can safely ignore this email.
+                </p>
+
+                <p style="color:red;">
+                  If you didn't log in, please change your password immediately.
+                </p>
+
+                <br>
+
+                <b>Explore Tamil Nadu Team</b>
+
+              </div>
+
+            </div>
+
           </div>
+        `,
+      });
 
-          <div style="padding:30px;">
+      console.log("✅ Login Email Sent Successfully");
 
-            <h2>Hello ${user.fullName}, 👋</h2>
+    } catch (emailError) {
 
-            <p>Your account has been logged in successfully.</p>
+      console.error("❌ Login Email Failed");
+      console.error(emailError.message);
 
-            <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-              <tr>
-                <td style="padding:8px;"><strong>Email</strong></td>
-                <td style="padding:8px;">${user.email}</td>
-              </tr>
-
-              <tr>
-                <td style="padding:8px;"><strong>Date</strong></td>
-                <td style="padding:8px;">${loginDate.toLocaleDateString()}</td>
-              </tr>
-
-              <tr>
-                <td style="padding:8px;"><strong>Time</strong></td>
-                <td style="padding:8px;">${loginDate.toLocaleTimeString()}</td>
-              </tr>
-            </table>
-
-            <p>
-              If this login was you, no further action is required.
-            </p>
-
-            <p style="color:red;">
-              If you did NOT log in, please change your password immediately.
-            </p>
-
-            <hr>
-
-            <p>Thank you for using Explore Tamil Nadu.</p>
-
-            <strong>Explore Tamil Nadu Team</strong>
-
-          </div>
-
-        </div>
-      </div>
-    `,
-  });
-
-} catch (emailError) {
-  console.error("Login email failed:", emailError);
-}
+    }
 
     res.json({
       success: true,
@@ -187,12 +233,16 @@ try {
         email: user.email,
       },
     });
+
   } catch (error) {
+
     console.error(error);
 
     res.status(500).json({
       success: false,
       message: "Server Error",
     });
+
   }
+
 };
