@@ -51,6 +51,10 @@ const bookingSchema = new mongoose.Schema(
       enum: ["Pending", "Paid", "Failed"],
       default: "Paid",
     },
+    ticketPath: {
+      type: String,
+      default: "",
+    },
 
     bookingDate: {
       type: Date,

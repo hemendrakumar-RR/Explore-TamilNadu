@@ -114,8 +114,53 @@ fetch("https://explore-tamilnadu-api.onrender.com/api/bookings/my", {
         `;
 
     });
+    
 
     document.getElementById("bookingContainer").innerHTML = html;
 
 })
 .catch(err => console.error(err));
+async function downloadTicket(id) {
+
+    const token = localStorage.getItem("token");
+
+    try {
+
+        const response = await fetch(
+            `https://explore-tamilnadu-api.onrender.com/api/bookings/${id}/ticket`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to download ticket");
+        }
+
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+
+        a.href = url;
+
+        a.download = "ExploreTamilNadu-Ticket.pdf";
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        a.remove();
+
+        window.URL.revokeObjectURL(url);
+
+    } catch (err) {
+
+        alert(err.message);
+
+    }
+
+}

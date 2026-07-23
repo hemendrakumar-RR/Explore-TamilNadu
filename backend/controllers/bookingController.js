@@ -29,6 +29,10 @@ exports.createBooking = async (req, res) => {
         // Generate PDF Ticket
         const pdfPath = await generateTicket(booking, user);
 
+        // Save PDF path
+        booking.ticketPath = pdfPath;
+        await booking.save();
+
         // Send response immediately
         res.status(201).json({
             success: true,
@@ -102,6 +106,52 @@ exports.getMyBookings = async (req, res) => {
     } catch (error) {
 
         console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+
+    }
+};
+const path = require("path");
+const fs = require("fs");
+
+exports.downloadTicket = async (req, res) => {
+    try {
+
+        const booking = await Booking.findById(req.params.id);
+
+        if (!booking) {
+            return res.status(404).json({
+                success: false,
+                message: "Booking not found"
+            });
+        }
+
+        // Security: only the booking owner can download
+        if (booking.user.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied"
+            });
+        }
+
+        if (!booking.ticketPath || !fs.existsSync(booking.ticketPath)) {
+            return res.status(404).json({
+                success: false,
+                message: "Ticket not found"
+            });
+        }
+
+        res.download(
+            booking.ticketPath,
+            "ExploreTamilNadu-Ticket.pdf"
+        );
+
+    } catch (err) {
+
+        console.error(err);
 
         res.status(500).json({
             success: false,
