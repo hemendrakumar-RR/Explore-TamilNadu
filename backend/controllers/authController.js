@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
 
+
 // ================= REGISTER =================
 exports.register = async (req, res) => {
   try {
@@ -242,6 +243,159 @@ exports.login = async (req, res) => {
       success: false,
       message: "Server Error",
     });
+
+  }
+
+};
+// ================= SEND OTP =================
+
+exports.sendOTP = async (req, res) => {
+
+  try {
+
+      const { email } = req.body;
+
+      const user = await User.findOne({ email });
+
+      if (!user) {
+          return res.status(404).json({
+              success: false,
+              message: "User not found"
+          });
+      }
+
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      user.otp = otp;
+      user.otpExpiry = Date.now() + 5 * 60 * 1000;
+
+      await user.save();
+
+      await sendEmail({
+
+          email: user.email,
+
+          subject: "Password Reset OTP",
+
+          message: `
+              <h2>Hello ${user.fullName}</h2>
+
+              <p>Your OTP is:</p>
+
+              <h1 style="letter-spacing:5px;">
+                  ${otp}
+              </h1>
+
+              <p>This OTP is valid for 5 minutes.</p>
+
+              <br>
+
+              <b>Explore Tamil Nadu Team</b>
+          `
+      });
+
+      res.json({
+          success: true,
+          message: "OTP Sent Successfully"
+      });
+
+  }
+
+  catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+          success: false,
+          message: "Server Error"
+      });
+
+  }
+
+};
+// ================= VERIFY OTP =================
+
+exports.verifyOTP = async (req, res) => {
+
+  try {
+
+      const {
+
+          email,
+          otp,
+          newPassword
+
+      } = req.body;
+      if (!email || !otp || !newPassword) {
+        return res.status(400).json({
+            success: false,
+            message: "All fields are required"
+        });
+    }
+
+      const user = await User.findOne({ email });
+
+      if (!user) {
+
+          return res.status(404).json({
+
+              success: false,
+              message: "User not found"
+
+          });
+
+      }
+
+      if (user.otp !== otp) {
+
+          return res.status(400).json({
+
+              success: false,
+              message: "Invalid OTP"
+
+          });
+
+      }
+
+      if (!user.otpExpiry || user.otpExpiry < Date.now()) {
+          return res.status(400).json({
+
+              success: false,
+              message: "OTP Expired"
+
+          });
+
+      }
+
+      const hashed = await bcrypt.hash(newPassword, 10);
+
+      user.password = hashed;
+
+      user.otp = "";
+
+      user.otpExpiry = null;
+
+      await user.save();
+
+      res.json({
+
+          success: true,
+          message: "Password Updated Successfully"
+
+      });
+
+  }
+
+  catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+
+          success: false,
+          message: "Server Error"
+
+      });
 
   }
 

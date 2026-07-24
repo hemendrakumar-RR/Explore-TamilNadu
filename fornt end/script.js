@@ -61,9 +61,19 @@
         if (editName) editName.value = user.fullName;
         if (editEmail) editEmail.value = user.email;
         if (profileImage) {
-            profileImage.src =
-                'https://ui-avatars.com/api/?background=0B3D3D&color=fff&size=200&name=' +
-                encodeURIComponent(user.fullName);
+
+            if (user.profileImage && user.profileImage !== "") {
+        
+                profileImage.src = user.profileImage;
+        
+            } else {
+        
+                profileImage.src =
+                    "https://ui-avatars.com/api/?background=0B3D3D&color=fff&size=200&name=" +
+                    encodeURIComponent(user.fullName);
+        
+            }
+        
         }
     }
 
@@ -201,4 +211,62 @@
         const modalInstance = bootstrap.Modal.getInstance(profileModal);
         if (modalInstance) modalInstance.hide();
     };
+    const uploadInput = document.getElementById("profileUpload");
+
+if (uploadInput) {
+
+    uploadInput.addEventListener("change", async function (e) {
+
+        const file = e.target.files[0];
+
+        if (!file) return;
+
+        const formData = new FormData();
+
+        formData.append("photo", file);
+
+        try {
+
+            const response = await fetch(
+                "https://explore-tamilnadu-api.onrender.com/api/users/upload-photo",
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: "Bearer " + localStorage.getItem("token")
+                    },
+                    body: formData
+                }
+            );
+
+            const data = await response.json();
+
+            if (data.success) {
+
+                const user = getUser();
+
+                user.profileImage = data.image;
+
+                localStorage.setItem("user", JSON.stringify(user));
+
+                updateProfileModal(user);
+
+                alert("Profile picture updated successfully!");
+
+            } else {
+
+                alert(data.message);
+
+            }
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert("Upload failed.");
+
+        }
+
+    });
+
+}
 })();

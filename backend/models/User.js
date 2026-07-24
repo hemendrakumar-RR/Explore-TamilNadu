@@ -21,6 +21,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    otp: {
+      type: String,
+      default: ""
+  },
+  
+  otpExpiry: {
+      type: Date,
+      default: null
+  },
 
     phone: {
       type: String,

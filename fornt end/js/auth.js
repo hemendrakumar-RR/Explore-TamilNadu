@@ -143,5 +143,126 @@ function logout(e){
     location.reload();
 
 }
+// ================= SEND OTP =================
+
+async function sendOTP() {
+
+    const email = document.getElementById("forgotEmail").value.trim();
+
+    if (!email) {
+        alert("Please enter your email.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(`${API_URL}/send-otp`, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                email
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            alert("OTP has been sent to your email.");
+
+        } else {
+
+            alert(data.message);
+
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Server Error");
+
+    }
+
+}
+// ================= VERIFY OTP =================
+
+async function verifyOTP() {
+
+    const email = document.getElementById("forgotEmail").value.trim();
+
+    const otp = document.getElementById("forgotOTP").value.trim();
+
+    const newPassword =
+        document.getElementById("forgotNewPassword").value;
+
+    if (!email || !otp || !newPassword) {
+
+        alert("Please fill all fields.");
+
+        return;
+
+    }
+
+    try {
+
+        const response = await fetch(`${API_URL}/verify-otp`, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                email,
+                otp,
+                newPassword
+
+            })
+
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            alert("Password changed successfully.");
+
+            bootstrap.Modal.getInstance(
+                document.getElementById("forgotPasswordModal")
+            ).hide();
+
+            document.getElementById("forgotEmail").value = "";
+            document.getElementById("forgotOTP").value = "";
+            document.getElementById("forgotNewPassword").value = "";
+
+        } else {
+
+            alert(data.message);
+
+        }
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Server Error");
+
+    }
+
+}
+
+
+window.sendOTP = sendOTP;
+window.verifyOTP = verifyOTP;
+window.logout = logout;
 
 window.onload = updateNavbar;
