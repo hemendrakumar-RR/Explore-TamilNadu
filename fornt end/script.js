@@ -30,20 +30,47 @@
         if (!authButtons || !profileMenu || !userNameEl) return;
 
         if (isLoggedIn) {
+
             const user = getUser();
+        
             if (!user) {
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
                 setLoggedInUI(false);
                 return;
             }
-            authButtons.classList.add('d-none');
-            profileMenu.classList.remove('d-none');
+        
+            authButtons.classList.add("d-none");
+            profileMenu.classList.remove("d-none");
+        
             userNameEl.textContent = user.fullName;
-        } else {
-            authButtons.classList.remove('d-none');
-            profileMenu.classList.add('d-none');
-            userNameEl.textContent = 'Profile';
+        
+            const dropdownUserName = document.getElementById("dropdownUserName");
+            const dropdownUserEmail = document.getElementById("dropdownUserEmail");
+            const dropdownProfileImage = document.getElementById("dropdownProfileImage");
+        
+            if (dropdownUserName)
+                dropdownUserName.textContent = user.fullName;
+        
+            if (dropdownUserEmail)
+                dropdownUserEmail.textContent = user.email;
+        
+            if (dropdownProfileImage) {
+        
+                if (user.profileImage && user.profileImage !== "") {
+        
+                    dropdownProfileImage.src = user.profileImage;
+        
+                } else {
+        
+                    dropdownProfileImage.src =
+                        "https://ui-avatars.com/api/?background=0B3D3D&color=fff&size=200&name=" +
+                        encodeURIComponent(user.fullName);
+        
+                }
+        
+            }
+        
         }
     }
 
@@ -246,11 +273,13 @@ if (uploadInput) {
 
                 user.profileImage = data.image;
 
-                localStorage.setItem("user", JSON.stringify(user));
+localStorage.setItem("user", JSON.stringify(user));
 
-                updateProfileModal(user);
+updateProfileModal(user);
 
-                alert("Profile picture updated successfully!");
+setLoggedInUI(true);
+
+alert("Profile picture updated successfully!");
 
             } else {
 

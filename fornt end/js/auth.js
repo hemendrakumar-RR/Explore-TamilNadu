@@ -129,6 +129,25 @@ function updateNavbar() {
     document.getElementById("dropdownUserName").textContent = user.fullName;
 
     document.getElementById("dropdownUserEmail").textContent = user.email;
+
+    const dropdownImg = document.getElementById("dropdownProfileImage");
+
+    if (dropdownImg) {
+
+        if (user.profileImage && user.profileImage !== "") {
+
+            dropdownImg.src = user.profileImage;
+
+        } else {
+
+            dropdownImg.src =
+                "https://ui-avatars.com/api/?background=0B3D3D&color=fff&size=200&name=" +
+                encodeURIComponent(user.fullName);
+
+        }
+
+    }
+
 }
 
 // ================= LOGOUT =================
